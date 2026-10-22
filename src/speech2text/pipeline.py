@@ -39,7 +39,8 @@ EXTENSIONS = {
 
 def discover(source: Path, recursive: bool) -> list[Path]:
     if source.is_file():
-        if source.suffix.lower() not in EXTENSIONS:
+        # Messenger exports may have no extension; ffprobe validates their contents later.
+        if source.suffix and source.suffix.lower() not in EXTENSIONS:
             raise UserError(f"Неподдерживаемое расширение {source.suffix}.")
         return [source]
     if not source.is_dir():

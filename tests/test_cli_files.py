@@ -49,6 +49,24 @@ def test_empty_input_is_clear_error(tmp_path):
         discover(tmp_path, False)
 
 
+def test_extensionless_audio_is_detected_and_gets_txt_name(wav_file, tmp_path):
+    from speech2text.audio import probe
+
+    source = wav_file("audio", seconds=2)
+    assert discover(source, False) == [source]
+    assert probe(source) == pytest.approx(2)
+    assert targets([source], source, tmp_path)[source] == tmp_path / "audio.txt"
+
+
+def test_extensionless_non_audio_is_rejected_by_probe(tmp_path):
+    from speech2text.audio import probe
+
+    source = tmp_path / "audio"
+    source.write_text("This is not an audio recording.")
+    with pytest.raises(UserError, match="аудио"):
+        probe(source)
+
+
 def test_resume_skip_and_language_change(wav_file, tmp_path, monkeypatch):
     from speech2text import pipeline
     from speech2text.backends import Transcript, Word
